@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Balance Washington's Budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF1F2; --panel:#FFFFFF; --ink:#18252C; --muted:#56646B; --line:#CCD6DA;
+  --sound:#1F4A63; --fir:#2A6B52; --cedar:#B45F1E; --cedarbg:#FBEFE3; --firbg:#E6F2EC;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10181C; --panel:#18232A; --ink:#E4ECEF; --muted:#9AAAB1; --line:#2C3B43;
+    --sound:#7FB3D1; --fir:#6CC39A; --cedar:#E8A25E; --cedarbg:#2C2117; --firbg:#16291F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10181C; --panel:#18232A; --ink:#E4ECEF; --muted:#9AAAB1; --line:#2C3B43;
+  --sound:#7FB3D1; --fir:#6CC39A; --cedar:#E8A25E; --cedarbg:#2C2117; --firbg:#16291F;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+main{max-width:1120px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:clamp(1.8rem,4.5vw,2.6rem);line-height:1.1;margin:0 0 8px;font-weight:800;color:var(--sound);letter-spacing:-0.015em}
+.intro{max-width:66ch;color:var(--muted);margin:0 0 20px}
+/* hero balance */
+.balance{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.balrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+.gap{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:800;line-height:1}
+.gap.neg{color:var(--cedar)} .gap.pos{color:var(--fir)}
+.gaplabel{font-weight:600}
+.sub{color:var(--muted);font-size:.92rem}
+.bars{margin-top:12px;display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:88px 1fr 72px;align-items:center;gap:8px;font-size:.9rem}
+.track{height:14px;background:var(--bg);border-radius:7px;overflow:hidden}
+.fill{height:100%;border-radius:7px;transition:width .25s ease}
+.fill.rev{background:var(--sound)} .fill.spend{background:var(--cedar)}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.presets button,.reset{font:inherit;font-size:.9rem;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);cursor:pointer}
+.presets button:hover{border-color:var(--sound)}
+.presets button[aria-pressed="true"]{background:var(--sound);color:var(--panel);border-color:var(--sound)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+h2{font-size:1.25rem;margin:0 0 4px}
+.lede{color:var(--muted);margin:0 0 14px;font-size:.93rem}
+.item{padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.itemhead{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.itemname{font-weight:600}
+.amt{font-weight:700;white-space:nowrap}
+.amt.up{color:var(--fir)} .amt.down{color:var(--cedar)}
+.note{color:var(--muted);font-size:.84rem;margin-top:4px}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--sound)}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer}
+.switch input{width:20px;height:20px;accent-color:var(--sound);flex:none}
+input:focus-visible,button:focus-visible{outline:3px solid var(--sound);outline-offset:2px}
+.locked{color:var(--muted);font-size:.84rem}
+.consequences{margin-top:18px}
+.consequences ul{margin:0;padding-left:20px}
+.consequences li{margin:6px 0}
+.warn{color:var(--cedar)}
+.empty{color:var(--muted)}
+details{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+summary{cursor:pointer;font-weight:700}
+details li{margin:6px 0;color:var(--ink)}
+.tag{display:inline-block;font-size:.75rem;border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--muted);margin-left:6px;font-weight:500}
+a{color:var(--sound);font-weight:600}
+.about{margin-top:18px}
+.about p{max-width:66ch;margin:0 0 10px}
+.feedback{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--sound);color:var(--panel);text-decoration:none}
+.feedback[aria-disabled="true"]{background:var(--line);color:var(--muted);pointer-events:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Balance Washington's Budget</h1>
+<p class="intro">The state faces a gap in the 2027–29 budget. Add or remove revenue, adjust spending, and see what your choices would mean. All figures are two-year totals in billions of dollars for the state's main operating funds. Many are estimates; every assumption is listed at the bottom.</p>
+
+<div class="presets" role="group" aria-label="Starting points">
+  <button type="button" data-preset="current" aria-pressed="true">Current law</button>
+  <button type="button" data-preset="repeal">Income tax repealed</button>
+  <button type="button" data-preset="taxes">Close the gap with taxes</button>
+  <button type="button" data-preset="cuts">Close the gap with cuts</button>
+</div>
+
+<div class="balance" aria-live="polite">
+  <div class="balrow">
+    <span class="gap" id="gap">$0</span>
+    <span class="gaplabel" id="gaplabel">budget gap</span>
+  </div>
+  <div class="sub" id="gapsub"></div>
+  <div class="bars">
+    <div class="bar"><span>Revenue</span><div class="track"><div class="fill rev" id="revbar"></div></div><span id="revtxt"></span></div>
+    <div class="bar"><span>Spending</span><div class="track"><div class="fill spend" id="spendbar"></div></div><span id="spendtxt"></span></div>
+  </div>
+</div>
+
+<div class="cols">
+  <section aria-labelledby="h-rev">
+    <h2 id="h-rev">Revenue</h2>
+    <p class="lede">Existing taxes bring in about $79.1B over two years before the choices below.</p>
+    <div id="revenue"></div>
+  </section>
+  <section aria-labelledby="h-spend">
+    <h2 id="h-spend">Spending</h2>
+    <p class="lede">Current-law cost to continue today's services: about $85.6B. Slide to cut or add.</p>
+    <div id="spending"></div>
+  </section>
+</div>
+
+<section class="consequences" aria-labelledby="h-cons">
+  <h2 id="h-cons">What your choices mean</h2>
+  <ul id="cons"></ul>
+</section>
+
+<details>
+  <summary>Assumptions and sources</summary>
+  <ul>
+    <li>Revenue baseline: the Economic and Revenue Forecast Council's September 2026 forecast of about $82.6B for 2027–29, including about $3.5B from the new tax on income over $1 million. Existing taxes excluding that tax: about $79.1B.</li>
+    <li>Spending baseline: about $85.6B, the midpoint of an estimated $84.6–86.6B cost to continue current services, based on legislative staff's four-year outlook. The split among categories is an estimate based on the budget's published shares (K-12 about 42%, Medicaid about 12%, other human services about 24%, debt service about 4%).</li>
+    <li>Sales tax: each 0.1 point of the 6.5% state rate raises about $0.27B a year (Department of Revenue estimate), so about $0.53B per two-year budget. Household cost assumes a median household spends about $26,700 a year on taxable purchases (estimate).</li>
+    <li>Capital gains (~$1.1B) and estate (~$1.4B) figures double FY2025 collections from the Department of Revenue.</li>
+    <li>Luxury home sales surcharge (1% above $3.025M): about $150M a year, based on a 2024 legislative fiscal analysis. Tax break closures: about $423M a year from Department of Revenue revenue alternatives (2024), which need re-scoring.</li>
+    <li>Lawsuit payouts: about $1.3B projected for 2027–29 (Department of Enterprise Services). Reform savings range is an estimate.</li>
+    <li>Food assistance penalty: under federal law, an error rate above 6% triggers state cost-sharing of more than $90M a year from October 2027 (DSHS), about $0.17B for the budget period.</li>
+    <li>Consequence estimates use rough unit costs: about $125,000 a year per teacher including benefits; about $3,000 a year in state cost per Medicaid enrollee, with roughly a dollar of federal matching money per state dollar (actual match varies from 50% to 90%); about $30,000 a year per long-term care or developmental disabilities client; about $12,000 a year per child in subsidized child care; about $120,000 a year per public safety position; about $10,000 a year per college grant recipient. All are estimates for scale only.</li>
+    <li>Rainy-day fund: about $1.0B available; using it is one-time money that does not fix an ongoing gap.</li>
+    <li>This tool shows scale and trade-offs. It is not an official fiscal analysis.</li>
+  </ul>
+</details>
+
+<section class="about" aria-labelledby="h-about">
+  <h2 id="h-about">About this tool</h2>
+  <p>This is an independent, non-partisan tool to help Washingtonians understand the trade-offs in the state budget. It is not an official state estimate, and the assumptions above explain every number.</p>
+  <p>Spot an error, or have a better idea? Suggestions and corrections are welcome, especially with a source.</p>
+  <!-- Replace REPLACE-WITH-FORM-LINK below with your Google Form link -->
+  <p><a class="feedback" id="feedback" href="https://forms.gle/REPLACE-WITH-FORM-LINK" target="_blank" rel="noopener">Suggest an improvement</a></p>
+  <p class="note" id="feedbacknote">Anything you send is used only to improve this tool.</p>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmtB = v => (v<0?"-":"") + "$" + Math.abs(v).toFixed(2).replace(/\.?0+$/,"") + "B";
+const fmtB1 = v => (v<0?"−":"+") + "$" + Math.abs(v).toFixed(2) + "B";
+const num = n => Math.round(n).toLocaleString("en-US");
+
+const REV_BASE = 79.1;
+const SPEND_BASE = 85.6;
+
+const revenue = [
+  {id:"income", type:"toggle", name:"Tax on income over $1 million", value:3.5, def:true, note:"Passed in 2026; on the ballot for repeal. Paid only by households with income above $1M."},
+  {id:"capgains", type:"toggle", name:"Capital gains tax", value:1.1, def:true, note:"Existing 7% tax on large capital gains. Turn off to repeal."},
+  {id:"estate", type:"toggle", name:"Estate tax", value:1.4, def:true, note:"Existing tax on estates above $3M. Turn off to repeal."},
+  {id:"sales", type:"slider", name:"State sales tax rate change", min:-1, max:1, step:0.1, def:0, per:5.3, note:"Current state rate is 6.5%."},
+  {id:"reet", type:"toggle", name:"1% surcharge on home sales above $3.025M", value:0.3, def:false, note:"Paid by sellers of the most expensive homes. Revenue swings with the housing market."},
+  {id:"prefs", type:"toggle", name:"Close selected business tax breaks", value:0.85, def:false, note:"Trims preferential B&O rates and several exemptions; some items raise costs for consumers."},
+  {id:"luxury", type:"toggle", name:"Raise luxury vehicle tax from 8% to 10%", value:0.02, def:false, note:"Applies to the portion of a vehicle's price above $100,000."},
+  {id:"bsa", type:"slider", name:"Use rainy-day fund", min:0, max:1, step:0.1, def:0, per:1, note:"One-time money. Leaves less cushion for a recession.", fmt:v=>"$"+v.toFixed(1)+"B"},
+];
+
+const spending = [
+  {id:"k12", name:"K-12 public schools", base:37.5, min:-10, max:10, unit:125000, label:"teacher positions", note:"The state constitution makes funding basic education its paramount duty."},
+  {id:"medicaid", name:"Medicaid and health coverage", base:11.4, min:-15, max:10, unit:3000, label:"people's coverage for a year", fed:1, note:"Most state dollars draw federal matching funds."},
+  {id:"ltc", name:"Long-term care and disability services", base:8.6, min:-15, max:10, unit:30000, label:"seniors and people with disabilities served", fed:1},
+  {id:"dcyf", name:"Child care and children's services", base:4.8, min:-20, max:15, unit:12000, label:"children in subsidized child care"},
+  {id:"safety", name:"Corrections and public safety", base:4.6, min:-15, max:15, unit:120000, label:"public safety positions"},
+  {id:"otherhs", name:"Behavioral health, food and cash assistance", base:3.6, min:-20, max:15, unit:null},
+  {id:"higher", name:"Higher education", base:5.6, min:-20, max:15, unit:10000, label:"college grant recipients"},
+  {id:"natres", name:"Natural resources and wildfire", base:0.8, min:-25, max:25, unit:null},
+  {id:"govops", name:"Government operations, courts and other", base:4.0, min:-20, max:10, unit:null},
+  {id:"tort", name:"Lawsuit payouts", base:1.3, reform:true, note:"Projected payouts. Reform and prevention could reduce them."},
+  {id:"debt", name:"Debt service", base:3.4, locked:true, note:"Bond payments are legal obligations and can't be cut."},
+];
+const reforms = [
+  {id:"snap", name:"Get food assistance error rate below 6%", value:0.17, def:false, note:"Avoids a federal cost-sharing penalty starting October 2027."},
+];
+
+const state = {};
+function defaults(){
+  revenue.forEach(r=> state[r.id] = r.type==="toggle" ? r.def : r.def);
+  spending.forEach(s=> state[s.id] = 0);
+  state.tortReform = 0;
+  reforms.forEach(r=> state[r.id] = r.def);
+}
+
+function revValue(r){
+  if(r.type==="toggle"){
+    const base = ["income","capgains","estate"].includes(r.id);
+    if(base) return state[r.id] ? 0 : -r.value; // baseline includes these (income added separately)
+    return state[r.id] ? r.value : 0;
+  }
+  return state[r.id]*r.per;
+}
+
+function render(){
+  // revenue panel
+  $("revenue").innerHTML = revenue.map(r=>{
+    const v = revValue(r);
+    let ctl;
+    if(r.type==="toggle"){
+      ctl = `<label class="switch"><input type="checkbox" data-rev="${r.id}" ${state[r.id]?"checked":""}><span class="itemname">${r.name}</span></label>`;
+    } else {
+      const shown = r.fmt ? r.fmt(state[r.id]) : (state[r.id]>0?"+":"")+state[r.id].toFixed(1)+" pts";
+      ctl = `<div class="itemhead"><label class="itemname" for="rv-${r.id}">${r.name}</label><span>${shown}</span></div>
+             <input type="range" id="rv-${r.id}" data-rev="${r.id}" min="${r.min}" max="${r.max}" step="${r.step}" value="${state[r.id]}">`;
+    }
+    const eff = r.id==="income" ? (state.income?0:-r.value) : v;
+    const amt = eff===0 ? "" : `<span class="amt ${eff>0?"up":"down"}">${fmtB1(eff)}</span>`;
+    return `<div class="item">${r.type==="toggle"?`<div class="itemhead">${ctl}${amt}</div>`:ctl+(amt?`<div class="itemhead"><span></span>${amt}</div>`:"")}<div class="note">${r.note}</div></div>`;
+  }).join("");
+
+  // spending panel
+  $("spending").innerHTML = spending.map(s=>{
+    if(s.locked) return `<div class="item"><div class="itemhead"><span class="itemname">${s.name}<span class="tag">fixed</span></span><span class="amt">$${s.base.toFixed(1)}B</span></div><div class="locked">${s.note}</div></div>`;
+    if(s.reform){
+      const save = s.base*state.tortReform/100;
+      return `<div class="item"><div class="itemhead"><label class="itemname" for="tr">${s.name}: reduce by ${state.tortReform}%</label><span class="amt ${save>0?"up":""}">$${(s.base-save).toFixed(2)}B</span></div>
+      <input type="range" id="tr" data-tort min="0" max="25" step="5" value="${state.tortReform}"><div class="note">${s.note}</div></div>`;
+    }
+    const pct = state[s.id], newv = s.base*(1+pct/100);
+    return `<div class="item"><div class="itemhead"><label class="itemname" for="sp-${s.id}">${s.name}</label><span class="amt ${pct<0?"up":pct>0?"down":""}">$${newv.toFixed(2)}B <span class="sub">(${pct>0?"+":""}${pct}%)</span></span></div>
+      <input type="range" id="sp-${s.id}" data-spend="${s.id}" min="${s.min}" max="${s.max}" step="1" value="${pct}">${s.note?`<div class="note">${s.note}</div>`:""}</div>`;
+  }).join("") + reforms.map(r=>`<div class="item"><div class="itemhead"><label class="switch"><input type="checkbox" data-reform="${r.id}" ${state[r.id]?"checked":""}><span class="itemname">${r.name}</span></label>${state[r.id]?`<span class="amt up">−$${r.value.toFixed(2)}B</span>`:""}</div><div class="note">${r.note}</div></div>`).join("");
+
+  bind();
+  compute();
+}
+
+function compute(){
+  let rev = REV_BASE + (state.income?3.5:0);
+  revenue.forEach(r=>{ if(r.id!=="income") rev += revValue(r); });
+  let spend = 0;
+  spending.forEach(s=>{
+    if(s.locked) spend += s.base;
+    else if(s.reform) spend += s.base*(1-state.tortReform/100);
+    else spend += s.base*(1+state[s.id]/100);
+  });
+  reforms.forEach(r=>{ if(state[r.id]) spend -= r.value; });
+  const gap = rev - spend;
+  const oneTime = state.bsa;
+  const g = $("gap");
+  g.textContent = (gap<0?"−":"+") + "$" + Math.abs(gap).toFixed(2) + "B";
+  g.className = "gap " + (gap<0?"neg":"pos");
+  $("gaplabel").textContent = gap<0 ? "budget gap" : "balanced, with room to spare";
+  $("gapsub").textContent = gap<0
+    ? "State law requires a balanced four-year budget, so a gap has to be closed with more revenue, less spending, or both."
+    : (oneTime>0 && gap-oneTime<0 ? `Balanced only with $${oneTime.toFixed(1)}B of one-time rainy-day money. The ongoing gap returns next budget.` : "Balanced for 2027–29.");
+  const max = Math.max(rev,spend,1);
+  $("revbar").style.width = (rev/max*100)+"%"; $("spendbar").style.width = (spend/max*100)+"%";
+  $("revtxt").textContent = "$"+rev.toFixed(1)+"B"; $("spendtxt").textContent = "$"+spend.toFixed(1)+"B";
+  consequences(gap);
+}
+
+function consequences(gap){
+  const out = [];
+  // revenue
+  if(!state.income) out.push("Repealing the income tax removes about $3.5B in 2027–29 and much more in later years, and lowers taxes for households with income over $1 million.");
+  if(!state.capgains) out.push("Repealing the capital gains tax removes about $1.1B, mostly from high-income investors.");
+  if(!state.estate) out.push("Repealing the estate tax removes about $1.4B, from estates above $3 million.");
+  if(state.sales!==0){
+    const hh = Math.abs(state.sales)/100*26700;
+    out.push(`Changing the state sales tax by ${state.sales>0?"+":""}${state.sales.toFixed(1)} points ${state.sales>0?"raises":"cuts"} about $${Math.abs(state.sales*5.3).toFixed(1)}B, roughly $${num(hh)} a year for a typical household. Sales taxes take a larger share of income from lower-income families.`);
+  }
+  if(state.reet) out.push("The luxury home sales surcharge raises about $0.3B from sellers of homes above $3.025M, but collections swing sharply with the housing market.");
+  if(state.prefs) out.push("Closing selected tax breaks raises about $0.85B; the affected industries will oppose it, and some items raise prices for consumers.");
+  if(state.luxury) out.push("Raising the luxury vehicle tax adds only about $20M. Luxury taxes on goods raise little.");
+  if(state.bsa>0) out.push(`Using $${state.bsa.toFixed(1)}B of the rainy-day fund leaves less cushion for a recession and doesn't fix the ongoing gap.`);
+  // spending
+  spending.forEach(s=>{
+    if(s.locked||s.reform) return;
+    const pct = state[s.id]; if(!pct) return;
+    const delta = s.base*pct/100; // $B biennium
+    let t = `${s.name}: ${pct<0?"cut":"increase"} of $${Math.abs(delta).toFixed(2)}B`;
+    if(s.unit){ t += `, roughly ${num(Math.abs(delta)*1e9/(s.unit*2))} ${pct<0?"fewer":"more"} ${s.label} per year`; }
+    if(s.fed && pct<0) t += `, plus about $${Math.abs(delta*s.fed).toFixed(2)}B in federal matching funds lost`;
+    t += ".";
+    if(s.id==="k12" && pct<0) t += ` <span class="warn">Cuts to basic education may conflict with the state constitution; enhancements beyond basic education are more likely to be cut.</span>`;
+    out.push(t);
+  });
+  if(state.tortReform>0) out.push(`Reducing lawsuit payouts by ${state.tortReform}% saves about $${(1.3*state.tortReform/100).toFixed(2)}B. It requires legal reform and better prevention in child welfare and corrections, and survivors' advocates oppose limits.`);
+  if(state.snap) out.push("Getting food assistance errors below 6% avoids about $0.17B in federal penalties. It depends on management improvements succeeding in time.");
+  $("cons").innerHTML = out.length ? out.map(t=>`<li>${t}</li>`).join("") : `<li class="empty">Change a revenue source or spending category to see what it would mean.</li>`;
+}
+
+function bind(){
+  document.querySelectorAll("[data-rev]").forEach(el=>{
+    const id = el.dataset.rev;
+    el.addEventListener(el.type==="checkbox"?"change":"input", ()=>{
+      state[id] = el.type==="checkbox" ? el.checked : parseFloat(el.value);
+      clearPreset(); if(el.type==="checkbox") render(); else { updateLabel(el, id); compute(); }
+    });
+  });
+  document.querySelectorAll("[data-spend]").forEach(el=>{
+    el.addEventListener("input", ()=>{ state[el.dataset.spend] = parseInt(el.value,10); clearPreset(); refreshSpendLabel(el); compute(); });
+  });
+  const tr = document.querySelector("[data-tort]");
+  if(tr) tr.addEventListener("input", ()=>{ state.tortReform = parseInt(tr.value,10); clearPreset(); refreshTort(tr); compute(); });
+  document.querySelectorAll("[data-reform]").forEach(el=>{
+    el.addEventListener("change", ()=>{ state[el.dataset.reform] = el.checked; clearPreset(); render(); });
+  });
+}
+function updateLabel(el,id){
+  const r = revenue.find(x=>x.id===id);
+  const head = el.previousElementSibling.lastElementChild;
+  head.textContent = r.fmt ? r.fmt(state[id]) : (state[id]>0?"+":"")+state[id].toFixed(1)+" pts";
+  const eff = revValue(r);
+  let amtRow = el.nextElementSibling && el.nextElementSibling.classList.contains("itemhead") ? el.nextElementSibling : null;
+  if(eff===0){ if(amtRow) amtRow.remove(); return; }
+  if(!amtRow){ amtRow = document.createElement("div"); amtRow.className="itemhead"; amtRow.innerHTML="<span></span><span></span>"; el.after(amtRow); }
+  amtRow.lastElementChild.className = "amt "+(eff>0?"up":"down");
+  amtRow.lastElementChild.textContent = fmtB1(eff);
+}
+function refreshSpendLabel(el){
+  const s = spending.find(x=>x.id===el.dataset.spend);
+  const pct = state[s.id], newv = s.base*(1+pct/100);
+  const amt = el.previousElementSibling.lastElementChild;
+  amt.className = "amt "+(pct<0?"up":pct>0?"down":"");
+  amt.innerHTML = `$${newv.toFixed(2)}B <span class="sub">(${pct>0?"+":""}${pct}%)</span>`;
+}
+function refreshTort(el){
+  const head = el.previousElementSibling;
+  head.firstElementChild.textContent = `Lawsuit payouts: reduce by ${state.tortReform}%`;
+  const save = 1.3*state.tortReform/100;
+  head.lastElementChild.textContent = `$${(1.3-save).toFixed(2)}B`;
+  head.lastElementChild.className = "amt "+(save>0?"up":"");
+}
+function clearPreset(){ document.querySelectorAll("[data-preset]").forEach(b=>b.setAttribute("aria-pressed","false")); }
+
+const presets = {
+  current: ()=>{},
+  repeal: ()=>{ state.income=false; },
+  taxes: ()=>{ state.sales=0.6; },
+  cuts: ()=>{ spending.forEach(s=>{ if(!s.locked && !s.reform) state[s.id] = s.id==="k12" ? -3 : -5; }); },
+};
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{
+  defaults(); presets[b.dataset.preset]();
+  document.querySelectorAll("[data-preset]").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+  render();
+}));
+
+defaults(); render();
+(function(){
+  const fb = document.getElementById("feedback");
+  if(fb && fb.href.includes("REPLACE-WITH-FORM-LINK")){
+    fb.setAttribute("aria-disabled","true"); fb.removeAttribute("href");
+    fb.textContent = "Feedback form coming soon";
+  }
+})();
+</script>
+</body>
+</html>
